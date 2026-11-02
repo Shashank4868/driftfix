@@ -85,7 +85,14 @@ jobs:
 
 ## Tried on real repositories
 
-Driftfix's output was reviewed by hand on open-source projects that still call removed SDK APIs, and offered upstream as pull requests. Each was checked against the current SDK (`mypy` for Python, `tsc` for TypeScript) before opening. See [the list of pull requests](https://github.com/pulls?q=is%3Apr+author%3AShashank4868+driftfix) and their status.
+Driftfix's output was reviewed by hand on open-source projects that still call removed SDK APIs, and offered upstream as pull requests. Each was checked against the current SDK (`mypy` for Python, `tsc` for TypeScript) before opening.
+
+| Pull request | Migration | Check |
+|---|---|---|
+| [sourcegraph/zendesk-discord-integration#15](https://github.com/sourcegraph/zendesk-discord-integration/pull/15) | Node 3.x -> 4.x, TypeScript, `package.json` + pnpm lockfile | `tsc --noEmit` passes on openai 4.104 |
+| [anvaka/local-chat#2](https://github.com/anvaka/local-chat/pull/2) | Python 0.x -> 1.x | mypy: `main` fails, branch clean |
+| [batuhantoker/Flask-OpenAI-Chatbot#13](https://github.com/batuhantoker/Flask-OpenAI-Chatbot/pull/13) | Python 0.x -> 1.x + pin | mypy: `main` fails, branch clean |
+| [gecitemre/issue-filler#1](https://github.com/gecitemre/issue-filler/pull/1) | Flagged by Driftfix, fixed by hand | mypy: `main` fails, branch clean |
 
 Reviewing those diffs found real bugs in Driftfix (quote styles, re-indentation, `OpenAIApi` used as a type, function-local imports), and each one is now a regression test.
 
