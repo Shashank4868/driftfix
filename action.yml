@@ -1,0 +1,79 @@
+name: Driftfix
+description: Find code broken by an API provider's breaking change, and optionally open a verified pull request that fixes it.
+author: Driftfix
+branding:
+  icon: git-pull-request
+  color: blue
+
+inputs:
+  path:
+    description: Directory to scan.
+    default: "."
+  change:
+    description: Change id from `driftfix changes`, or `auto` to detect it.
+    default: auto
+  mode:
+    description: "`scan` reports affected code; `fix` also patches, verifies with your tests, and opens a pull request."
+    default: scan
+  fail-on-findings:
+    description: Fail the job when affected code is found (scan mode).
+    default: "false"
+  github-token:
+    description: Token used to push the branch and open the pull request (fix mode). Needs contents and pull-requests write.
+    default: ${{ github.token }}
+
+outputs:
+  edits:
+    description: Number of mechanical edits Driftfix found.
+    value: ${{ steps.scan.outputs.edits }}
+  pr-url:
+    description: URL of the pull request opened in fix mode.
+    value: ${{ steps.fix.outputs.pr-url }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install Driftfix
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}"
+
+    - name: Scan
+      id: scan
+      shell: bash
+      env:
+        TARGET: ${{ inputs.path }}
+        CHANGE: ${{ inputs.change }}
+      run: |
+        set +e
+        driftfix scan "$TARGET" --change "$CHANGE" --markdown >> "$GITHUB_STEP_SUMMARY"
+        driftfix scan "$TARGET" --change "$CHANGE" --json > "$RUNNER_TEMP/driftfix.json"
+        edits=$(python -c "import json,sys; print(json.load(open(sys.argv[1]))['edits'])" "$RUNNER_TEMP/driftfix.json")
+        echo "edits=$edits" >> "$GITHUB_OUTPUT"
+        echo "Driftfix found $edits edit(s)."
+
+    - name: Fix and open a pull request
+      id: fix
+      if: inputs.mode == 'fix' && steps.scan.outputs.edits != '0'
+      shell: bash
+      env:
+        TARGET: ${{ inputs.path }}
+        CHANGE: ${{ inputs.change }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        git config user.name "driftfix[bot]"
+        git config user.email "driftfix@users.noreply.github.com"
+        driftfix run "$TARGET" --change "$CHANGE" --open-pr --json > "$RUNNER_TEMP/driftfix-run.json"
+        status=$?
+        python -c "import json,sys; r=json.load(open(sys.argv[1])); print('pr-url=' + (r.get('pr_url') or ''))" "$RUNNER_TEMP/driftfix-run.json" >> "$GITHUB_OUTPUT"
+        exit $status
+
+    - name: Fail on findings
+      if: inputs.mode == 'scan' && inputs.fail-on-findings == 'true' && steps.scan.outputs.edits != '0'
+      shell: bash
+      run: |
+        echo "::error::Driftfix found code affected by a breaking API change. See the job summary."
+        exit 1

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "driftfix"
+version = "0.2.0"
+description = "Turns API changelogs into verified pull requests."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = ["libcst>=1.1"]
+keywords = ["codemod", "migration", "openai", "api", "refactoring", "pull-request"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Code Generators",
+]
+
+[project.urls]
+Homepage = "https://shashank4868.github.io/driftfix/"
+Source = "https://github.com/Shashank4868/driftfix"
+Issues = "https://github.com/Shashank4868/driftfix/issues"
+Changelog = "https://github.com/Shashank4868/driftfix/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "openai>=1.0"]
+
+[project.scripts]
+driftfix = "driftfix.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

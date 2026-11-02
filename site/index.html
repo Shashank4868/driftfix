@@ -1,0 +1,350 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Driftfix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Driftfix turns API changelogs into verified pull requests. When a provider ships a breaking change, it rewrites every affected call, proves the fix with your tests and opens a PR.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+
+<div class="announce"><div class="wrap"><span><b>New:</b> OpenAI Python SDK 0.x → 1.x migrations are live.</span><a href="#try">Try it on your code <span data-icon="arrowR" data-size="13"></span></a></div></div>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="brand" href="#hero" aria-label="Driftfix home">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="var(--fg)"/><path d="M7 16.5c0-4.5 2.6-7 7-7h2.5" stroke="var(--bg)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="m14.5 6.5 3 3-3 3" stroke="var(--bg)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Driftfix
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#product">Product</a>
+      <a href="#try">Playground</a>
+      <a href="#why">Why now</a>
+      <a href="#how">How it works</a>
+      <a href="#security">Security</a>
+    </nav>
+    <div class="right">
+      <button type="button" class="btn sm" data-demo="inbox" data-full="1">Live demo</button>
+      <a class="btn sm primary" href="#contact">Request access</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="hero">
+    <div class="wrap">
+      <a class="eyebrow-link" href="#coverage"><span class="tag">Live</span>OpenAI Python SDK 0.x → 1.x <span data-icon="chevR" data-size="13"></span></a>
+      <h1>APIs change.<br><span class="soft">Your code gets a</span> pull request.</h1>
+      <p class="sub">Driftfix reads a provider's breaking change, rewrites every affected call in your codebase, proves the fix with your own tests and opens a pull request your team can review in a minute.</p>
+      <div class="ctas">
+        <button type="button" class="btn lg primary" data-demo="inbox">Explore the live demo</button>
+        <a class="btn lg" href="#try"><span data-icon="terminal" data-size="15"></span>Try it on your code</a>
+      </div>
+      <div class="facts">
+        <span data-icon="shield" data-size="14">Pull requests only, never pushes to main</span>
+        <span data-icon="check" data-size="14">Tests run before and after every patch</span>
+        <span data-icon="zap" data-size="14">One engine in the CLI and the browser</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="showcase" id="product">
+    <div class="wrap">
+      <div class="window" id="demo">
+        <div class="win-bar">
+          <div class="lights"><i></i><i></i><i></i></div>
+          <div class="win-title"><span class="live"></span>driftfix · acme</div>
+          <div class="win-actions"><span>Live demo · sample repositories</span><button type="button" class="icon-btn" data-demo="" data-full="1" aria-label="Open full screen" data-icon="max" data-size="15"></button></div>
+        </div>
+        <div class="app" id="app"></div>
+      </div>
+      <div class="caption">
+        <span data-icon="play" data-size="13">The real product, running in your browser on four sample repositories. Every number comes from the migration engine.</span>
+        <span><kbd>Ctrl</kbd> <kbd>K</kbd> to search inside</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="try">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="kicker">Playground</span>
+        <h2>Paste old OpenAI code. <span class="soft">Get the migrated file, the diff and the pull request, right here.</span></h2>
+      </div>
+
+      <div class="pg">
+        <div class="pg-bar">
+          <div class="seg" role="group" aria-label="Input">
+            <button type="button" data-pgmode="support" aria-pressed="true">Support bot</button>
+            <button type="button" data-pgmode="worker" aria-pressed="false">Async worker</button>
+            <button type="button" data-pgmode="paste" aria-pressed="false">Paste your code</button>
+            <button type="button" data-pgmode="repo" aria-pressed="false">GitHub repo</button>
+          </div>
+          <div class="right">
+            <span class="live-note" id="pg-live"><i></i>Updates as you type</span>
+            <button type="button" class="btn sm primary" id="pg-run"><span data-icon="play" data-size="12"></span>Run Driftfix</button>
+          </div>
+        </div>
+        <div class="pg-repo" id="pg-repo" hidden>
+          <div class="field"><span data-icon="search" data-size="14"></span><input id="pg-repo-in" type="text" spellcheck="false" placeholder="github.com/owner/repo" aria-label="Public GitHub repository"></div>
+          <button type="button" class="btn sm primary" id="pg-scan">Scan repository</button>
+          <div class="ex">Real projects still on the old API:
+            <button type="button" class="chipbtn" data-repo="atomic14/command_line_chatgpt">atomic14/command_line_chatgpt</button>
+            <button type="button" class="chipbtn" data-repo="AineeJames/ChatGPTerminator">AineeJames/ChatGPTerminator</button>
+            <span>Works offline:</span>
+            <button type="button" class="chipbtn" data-sample="insights-pipeline">acme/insights-pipeline</button>
+          </div>
+        </div>
+        <ol class="pipe" id="pg-pipe" aria-live="polite"></ol>
+        <div id="pg-msg" hidden></div>
+        <div class="panes">
+          <div class="pane">
+            <div class="pane-h"><span class="fname"><span data-icon="file" data-size="13"></span><span id="pg-name">app.py</span></span><span class="right dim">Editable · <kbd>Ctrl</kbd> <kbd>↵</kbd> to run</span></div>
+            <div class="pg-files" id="pg-files" hidden></div>
+            <div class="editor">
+              <pre class="gutter" id="pg-gut" aria-hidden="true"></pre>
+              <div class="code-wrap">
+                <pre class="hl" id="pg-hl" aria-hidden="true"></pre>
+                <textarea class="src" id="pg-src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="Python source"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="pane">
+            <div class="pane-h">
+              <div class="tabs" role="tablist" aria-label="Result">
+                <button type="button" role="tab" data-pgtab="diff" aria-selected="true">Diff</button>
+                <button type="button" role="tab" data-pgtab="edits" aria-selected="false">Edits <span id="pg-c-edits">0</span></button>
+                <button type="button" role="tab" data-pgtab="pr" aria-selected="false">Pull request</button>
+                <button type="button" role="tab" data-pgtab="review" aria-selected="false">Review <span id="pg-c-review">0</span></button>
+              </div>
+              <div class="right"><button type="button" class="btn sm" id="pg-copy"><span data-icon="copy" data-size="13"></span><span class="lbl">Copy result</span></button></div>
+            </div>
+            <div class="out" id="pg-out" role="tabpanel"></div>
+          </div>
+        </div>
+        <div class="pg-status" id="pg-status"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="why">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="kicker">Why now</span>
+        <h2>APIs break on a schedule now. <span class="soft">Someone on your team has to notice, read the changelog and rewrite the calls before the date.</span></h2>
+      </div>
+      <div class="why">
+        <div class="cadence">
+          <table>
+            <thead><tr><th>Provider</th><th>How often it breaks</th><th>Old versions</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr><td>Google Ads</td><td>Four major API versions a year since January 2026</td><td class="when">sunset after ~12 months</td><td><a href="https://ppc.land/google-ads-api-shifts-to-monthly-releases-starting-january-2026/" target="_blank" rel="noopener">PPC Land <span data-icon="ext" data-size="12"></span></a></td></tr>
+              <tr><td>Stripe</td><td>A potentially breaking major release twice a year</td><td class="when">pinned until you upgrade</td><td><a href="https://docs.stripe.com/api/versioning" target="_blank" rel="noopener">Stripe docs <span data-icon="ext" data-size="12"></span></a></td></tr>
+              <tr><td>Shopify</td><td>A new Admin API version every quarter</td><td class="when">supported ~12 months</td><td><a href="https://shopify.dev/docs/api/usage/versioning" target="_blank" rel="noopener">Shopify docs <span data-icon="ext" data-size="12"></span></a></td></tr>
+              <tr><td>Salesforce</td><td>Retired API versions 21 through 30 in 2025</td><td class="when">calls now fail</td><td><a href="https://help.salesforce.com/s/articleView?id=000389618&amp;language=en_US&amp;type=1" target="_blank" rel="noopener">Salesforce <span data-icon="ext" data-size="12"></span></a></td></tr>
+              <tr><td>OpenAI</td><td>Removed the module-level Python API in 1.0</td><td class="when">raises APIRemovedInV1</td><td><a href="https://github.com/openai/openai-python/discussions/742" target="_blank" rel="noopener">Migration guide <span data-icon="ext" data-size="12"></span></a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="stat-card">
+          <span class="big">87%</span>
+          <p><b>of 251 REST API versions with breaking changes gave no deprecation notice in the version before.</b> Teams usually find out when production breaks.</p>
+          <a href="https://arxiv.org/abs/2008.12808" target="_blank" rel="noopener">Study on arXiv <span data-icon="ext" data-size="12"></span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="how">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="kicker">How it works</span>
+        <h2>Changelog in, verified pull request out. <span class="soft">Every step is inspectable, and nothing is guessed.</span></h2>
+      </div>
+      <div class="how">
+        <div><span class="n">01 · Read</span><h3>Map the change</h3><p>Each breaking change becomes an entry in the change map: versions, dates, changelog and rewrite rules.</p>
+          <pre class="art" data-hl>OPENAI_PYTHON_V1 = Change(
+    id="openai-python-v1",
+    from_version="0.x",
+    to_version=">=1.0",
+    released="2023-11-06",
+)</pre></div>
+        <div><span class="n">02 · Find</span><h3>Find every call</h3><p>The code is parsed, and the API is followed through aliases, loops and comprehensions, not grepped.</p>
+          <pre class="art" data-hl="v0">import openai as oa
+
+r = oa.ChatCompletion.create(...)
+for row in r["data"]:
+    print(row["embedding"])</pre></div>
+        <div><span class="n">03 · Fix</span><h3>Rewrite the syntax tree</h3><p>Edits land on the concrete syntax tree, so comments, quoting and formatting survive.</p>
+          <div class="art"><div class="dl del"><span class="ds">-</span><span>r = oa.ChatCompletion.create(</span></div><div class="dl add"><span class="ds">+</span><span>r = client.chat.completions.create(</span></div><div class="dl del"><span class="ds">-</span><span>r["choices"][0]["message"]</span></div><div class="dl add"><span class="ds">+</span><span>r.choices[0].message</span></div></div></div>
+        <div><span class="n">04 · Prove</span><h3>Test, then open the PR</h3><p>Your tests run before and after. If they don't pass, the patch is rolled back and nothing is opened.</p>
+          <pre class="art"><span class="bad">✕</span> tests before   3 failed
+<span class="ok">✓</span> removed calls  0 left
+<span class="ok">✓</span> tests after    3 passed
+<span class="ok">✓</span> pull request   opened</pre></div>
+      </div>
+
+      <div class="cli">
+        <div>
+          <h3>The same engine on the command line</h3>
+          <p>Run it in CI or on a laptop. It scans, patches, runs the repository's own tests, commits to a branch and writes the pull request.</p>
+          <div class="cmds"><div><span>$</span> driftfix scan .</div><div><span>$</span> driftfix run .</div><div><span>$</span> driftfix run . --open-pr</div></div>
+        </div>
+        <div class="term" id="rec" aria-label="Recorded Driftfix CLI run">
+          <div class="term-bar"><i></i><i></i><i></i><span>~/support-bot</span><button type="button" id="rec-replay">Replay</button></div>
+          <pre><span class="l"><span class="c-dim">$</span> driftfix run .</span><span class="l"> </span><span class="l"><span class="c-b">driftfix</span> <span class="c-dim">0.1.0  support-bot</span></span><span class="l"> </span><span class="l">  <span class="c-amb">▸</span> Change         OpenAI Python SDK 0.x -&gt; &gt;=1.0</span><span class="l">  <span class="c-amb">▸</span> Scan           3 Python files, 1 affected, 8 edits</span><span class="l">  <span class="c-amb">▸</span> Tests before   <span class="c-red">3 failed</span>  <span class="c-dim">APIRemovedInV1</span></span><span class="l">  <span class="c-amb">▸</span> Patch          app.py  <span class="c-grn">+8</span> <span class="c-red">-7</span></span><span class="l">  <span class="c-amb">▸</span> Verify         compiled 1 file, tests <span class="c-grn">3 passed</span></span><span class="l">  <span class="c-amb">▸</span> Commit         d0d3c0f on driftfix/openai-python-v1</span><span class="l">  <span class="c-amb">▸</span> Pull request   ready  <span class="c-dim">DRIFTFIX_PR.md</span></span><span class="l"> </span><span class="l">  <span class="c-grn">Done</span> in 2.3s. 8 edits, verified.</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="security">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="kicker">Security</span>
+        <h2>Built to be merged. <span class="soft">Safe enough to let near production code.</span></h2>
+      </div>
+      <div class="three">
+        <div><span data-icon="branch" data-size="20"></span><h3>Pull requests only</h3><p>Driftfix works on its own branch and never pushes to a default branch. Your team reviews and merges.</p></div>
+        <div><span data-icon="refresh" data-size="20"></span><h3>Rolls back on failure</h3><p>If tests that passed before the patch fail after it, the patch is discarded and no pull request is opened.</p></div>
+        <div><span data-icon="alert" data-size="20"></span><h3>Says what it didn't do</h3><p>Patterns it can't rewrite safely are listed under "Needs a human look", with file and line, never guessed.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="coverage">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="kicker">Who it's for</span>
+        <h2>Two sides of the same breaking change.</h2>
+      </div>
+      <div class="two">
+        <div><span class="k">Engineering teams</span><h3>Stay current across every vendor</h3><p>Connect repositories once. When an API you depend on ships a breaking change, you get a review-ready pull request instead of a pager alert.</p>
+          <ul class="ticks"><li><span data-icon="check" data-size="15"></span>Every vendor's deprecations in one place</li><li><span data-icon="check" data-size="15"></span>Branches and PRs only, never main</li><li><span data-icon="check" data-size="15"></span>Ambiguous code flagged for a human</li></ul></div>
+        <div><span class="k">API companies</span><h3>Ship the change, not just the announcement</h3><p>Stop waiting for integrators to read the changelog. Push the migration into their code and retire old versions on schedule.</p>
+          <ul class="ticks"><li><span data-icon="check" data-size="15"></span>See which integrators are still on a retiring version</li><li><span data-icon="check" data-size="15"></span>Send each of them a tested pull request</li><li><span data-icon="check" data-size="15"></span>Fewer tickets and fewer delayed sunsets</li></ul></div>
+      </div>
+      <div class="cov">
+        <div><b>OpenAI Python SDK, 0.x to 1.x</b><span>Chat, completions, embeddings, images, audio, moderation, errors, async</span><span class="state-chip live"><i></i>Live</span></div>
+        <div><b>Stripe API versions</b><span>Version upgrades across Python and Node clients</span><span class="state-chip"><i></i>Next</span></div>
+        <div><b>Google Ads API</b><span>Quarterly versions and their sunsets</span><span class="state-chip"><i></i>Next</span></div>
+        <div><b>Shopify Admin API</b><span>Quarterly versions</span><span class="state-chip"><i></i>Planned</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="contact">
+    <div class="wrap contact">
+      <div class="sec-h">
+        <span class="kicker">Get started</span>
+        <h2>Your first migration is free.</h2>
+        <p>Send a repository that's stuck on an old API version. We'll run Driftfix on it and send you the pull request with test results, usually within a day.</p>
+        <div class="mail"><span>Or email</span><code id="mail-addr">hello@driftfix.dev</code><button type="button" class="btn sm" id="copy-mail"><span class="lbl">Copy</span></button></div>
+      </div>
+      <form class="lead" id="lead" novalidate>
+        <label for="f-email">Work email<input id="f-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required></label>
+        <label for="f-repo">Repository<input id="f-repo" name="repo" type="text" placeholder="github.com/your-org/your-repo" required></label>
+        <label for="f-api">Which API changed on you?
+          <select id="f-api" name="api"><option>OpenAI Python SDK</option><option>Stripe</option><option>Google Ads</option><option>Shopify</option><option>Something else</option></select>
+        </label>
+        <button class="btn lg primary" type="submit">Request my migration</button>
+        <p class="note">We only read the repository to run the migration. For private repositories we send a GitHub App link scoped to that one repository.</p>
+        <div class="notice" id="sent" hidden></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div><a class="brand" href="#hero"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="var(--fg)"/><path d="M7 16.5c0-4.5 2.6-7 7-7h2.5" stroke="var(--bg)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="m14.5 6.5 3 3-3 3" stroke="var(--bg)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Driftfix</a><p>Turns API changelogs into verified pull requests.</p></div>
+      <div><h4>Product</h4><ul><li><a href="#product">Live demo</a></li><li><a href="#try">Playground</a></li><li><a href="#how">How it works</a></li><li><a href="#coverage">Coverage</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#security">Security</a></li><li><a href="#contact">Request access</a></li><li><a href="#why">Why now</a></li></ul></div>
+    </div>
+    <div class="legal"><span>© 2026 Driftfix</span><span>Built by Ishaan Yadav</span></div>
+  </div>
+</footer>
+
+<script type="text/plain" id="sample-support">"""Customer-support helper for an online store. Written against openai 0.28."""
+
+import os
+
+import openai
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+SYSTEM = "You are a concise support agent for an online store. Answer in one or two sentences."
+
+
+def answer(question: str) -> str:
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": question},
+        ],
+        temperature=0.2,
+        request_timeout=20,
+    )
+    return response["choices"][0]["message"]["content"].strip()
+
+
+def embed(texts: list[str]) -> list[list[float]]:
+    result = openai.Embedding.create(model="text-embedding-3-small", input=texts)
+    return [row["embedding"] for row in result["data"]]
+
+
+def answer_with_retry(question: str, attempts: int = 3) -> str:
+    for _ in range(attempts):
+        try:
+            return answer(question)
+        except openai.error.RateLimitError:
+            continue
+    return "We're getting a lot of questions right now. A person will reply soon."
+</script>
+<script type="text/plain" id="sample-worker">"""Background worker: summaries, streaming replies and moderation. Written against openai 0.27."""
+
+import asyncio
+
+import openai
+
+from settings import OPENAI_KEY, OPENAI_ORG
+
+openai.api_key = OPENAI_KEY
+openai.organization = OPENAI_ORG
+
+
+async def summarize(document: str) -> str:
+    reply = await openai.ChatCompletion.acreate(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": f"Summarize in three bullets:\n{document}"}],
+    )
+    return reply["choices"][0]["message"]["content"]
+
+
+def stream_reply(prompt: str):
+    for chunk in openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        stream=True,
+    ):
+        yield chunk["choices"][0]["delta"].get("content", "")
+
+
+def is_safe(text: str) -> bool:
+    try:
+        return not openai.Moderation.create(input=text)["results"][0]["flagged"]
+    except openai.error.APIConnectionError:
+        return True  # fail open if moderation is down
+
+
+async def summarize_all(documents):
+    return await asyncio.gather(*(summarize(d) for d in documents))
+</script>
+
+<script src="engine.js" charset="utf-8"></script>
+<script src="workspace-data.js" charset="utf-8"></script>
+<script src="ui.js" charset="utf-8"></script>
+<script src="workspace.js" charset="utf-8"></script>
+<script src="site.js" charset="utf-8"></script>
