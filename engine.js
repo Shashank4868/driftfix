@@ -192,6 +192,12 @@
     if (!aliases.length) return result;
 
     var calls = findCalls(m, aliases);
+    // A client hoisted to module level would run before the function that configures it.
+    var local = /^[ \t]+import[ \t]+openai\b/m.exec(m);
+    if (local && calls.length) {
+      result.notes.push({ line: line(local.index), msg: "`openai` is imported inside a function, so where the client should live is a design choice; migrate this file by hand." });
+      return result;
+    }
     var tracked = trackResponses(m, calls);
     var edits = [];
     var notes = [];

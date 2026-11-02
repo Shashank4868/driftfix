@@ -1,14 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Driftfix</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Driftfix turns API changelogs into verified pull requests. When a provider ships a breaking change, it rewrites every affected call, proves the fix with your tests and opens a PR.">
+<meta name="theme-color" content="#0b0d10">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://shashank4868.github.io/driftfix/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Driftfix: APIs change. Your code gets a pull request.">
+<meta property="og:description" content="Rewrites code broken by an API provider's breaking change, proves the fix with your tests, and opens a pull request.">
+<meta property="og:url" content="https://shashank4868.github.io/driftfix/">
+<meta property="og:image" content="https://shashank4868.github.io/driftfix/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-<div class="announce"><div class="wrap"><span><b>New:</b> OpenAI Python SDK 0.x → 1.x migrations are live.</span><a href="#try">Try it on your code <span data-icon="arrowR" data-size="13"></span></a></div></div>
+<div class="announce"><div class="wrap"><span><b>New in 0.2:</b> OpenAI Node.js SDK 3.x → 4.x for JavaScript and TypeScript.</span><a href="#try">Try it on your code <span data-icon="arrowR" data-size="13"></span></a></div></div>
 
 <header class="top" id="top">
   <div class="wrap">
@@ -21,9 +35,11 @@
       <a href="#try">Playground</a>
       <a href="#why">Why now</a>
       <a href="#how">How it works</a>
-      <a href="#security">Security</a>
+      <a href="#pricing">Pricing</a>
+      <a href="docs.html">Docs</a>
     </nav>
     <div class="right">
+      <a class="icon-btn gh" href="https://github.com/Shashank4868/driftfix" target="_blank" rel="noopener" aria-label="Driftfix on GitHub" data-icon="github" data-size="17"></a>
       <button type="button" class="btn sm" data-demo="inbox" data-full="1">Live demo</button>
       <a class="btn sm primary" href="#contact">Request access</a>
     </div>
@@ -33,7 +49,7 @@
 <main>
   <section class="hero" id="hero">
     <div class="wrap">
-      <a class="eyebrow-link" href="#coverage"><span class="tag">Live</span>OpenAI Python SDK 0.x → 1.x <span data-icon="chevR" data-size="13"></span></a>
+      <a class="eyebrow-link" href="#coverage"><span class="tag">Live</span>OpenAI SDK migrations for Python and Node <span data-icon="chevR" data-size="13"></span></a>
       <h1>APIs change.<br><span class="soft">Your code gets a</span> pull request.</h1>
       <p class="sub">Driftfix reads a provider's breaking change, rewrites every affected call in your codebase, proves the fix with your own tests and opens a pull request your team can review in a minute.</p>
       <div class="ctas">
@@ -77,6 +93,7 @@
           <div class="seg" role="group" aria-label="Input">
             <button type="button" data-pgmode="support" aria-pressed="true">Support bot</button>
             <button type="button" data-pgmode="worker" aria-pressed="false">Async worker</button>
+            <button type="button" data-pgmode="node" aria-pressed="false">Node bot (TS)</button>
             <button type="button" data-pgmode="paste" aria-pressed="false">Paste your code</button>
             <button type="button" data-pgmode="repo" aria-pressed="false">GitHub repo</button>
           </div>
@@ -105,7 +122,7 @@
               <pre class="gutter" id="pg-gut" aria-hidden="true"></pre>
               <div class="code-wrap">
                 <pre class="hl" id="pg-hl" aria-hidden="true"></pre>
-                <textarea class="src" id="pg-src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="Python source"></textarea>
+                <textarea class="src" id="pg-src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="Source code"></textarea>
               </div>
             </div>
           </div>
@@ -143,6 +160,7 @@
               <tr><td>Shopify</td><td>A new Admin API version every quarter</td><td class="when">supported ~12 months</td><td><a href="https://shopify.dev/docs/api/usage/versioning" target="_blank" rel="noopener">Shopify docs <span data-icon="ext" data-size="12"></span></a></td></tr>
               <tr><td>Salesforce</td><td>Retired API versions 21 through 30 in 2025</td><td class="when">calls now fail</td><td><a href="https://help.salesforce.com/s/articleView?id=000389618&amp;language=en_US&amp;type=1" target="_blank" rel="noopener">Salesforce <span data-icon="ext" data-size="12"></span></a></td></tr>
               <tr><td>OpenAI</td><td>Removed the module-level Python API in 1.0</td><td class="when">raises APIRemovedInV1</td><td><a href="https://github.com/openai/openai-python/discussions/742" target="_blank" rel="noopener">Migration guide <span data-icon="ext" data-size="12"></span></a></td></tr>
+              <tr><td>OpenAI (Node)</td><td>Replaced <code>OpenAIApi</code> and <code>Configuration</code> in 4.0</td><td class="when">"is not a constructor"</td><td><a href="https://github.com/openai/openai-node/discussions/217" target="_blank" rel="noopener">Migration guide <span data-icon="ext" data-size="12"></span></a></td></tr>
             </tbody>
           </table>
         </div>
@@ -225,10 +243,44 @@ for row in r["data"]:
           <ul class="ticks"><li><span data-icon="check" data-size="15"></span>See which integrators are still on a retiring version</li><li><span data-icon="check" data-size="15"></span>Send each of them a tested pull request</li><li><span data-icon="check" data-size="15"></span>Fewer tickets and fewer delayed sunsets</li></ul></div>
       </div>
       <div class="cov">
-        <div><b>OpenAI Python SDK, 0.x to 1.x</b><span>Chat, completions, embeddings, images, audio, moderation, errors, async</span><span class="state-chip live"><i></i>Live</span></div>
+        <div><b>OpenAI Python SDK, 0.x to 1.x</b><span>Chat, completions, embeddings, images, audio, moderation, errors, async, dependency pins</span><span class="state-chip live"><i></i>Live</span></div>
+        <div><b>OpenAI Node.js SDK, 3.x to 4.x</b><span>JavaScript and TypeScript: client, resources, <code>.data</code> unwrapping, types, <code>package.json</code> and lockfiles</span><span class="state-chip live"><i></i>Live</span></div>
         <div><b>Stripe API versions</b><span>Version upgrades across Python and Node clients</span><span class="state-chip"><i></i>Next</span></div>
         <div><b>Google Ads API</b><span>Quarterly versions and their sunsets</span><span class="state-chip"><i></i>Next</span></div>
         <div><b>Shopify Admin API</b><span>Quarterly versions</span><span class="state-chip"><i></i>Planned</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="pricing">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="kicker">Pricing</span>
+        <h2>Free to run yourself. <span class="soft">Pay when you want it to happen without you.</span></h2>
+      </div>
+      <div class="plans">
+        <div class="plan">
+          <h3>Open source</h3>
+          <div class="price"><b>$0</b><span>MIT licensed</span></div>
+          <p>The CLI and the GitHub Action. Every published migration, on your own machine or CI.</p>
+          <ul class="ticks"><li><span data-icon="check" data-size="15"></span><code>driftfix scan</code> and <code>run</code></li><li><span data-icon="check" data-size="15"></span>Tests before and after, rollback</li><li><span data-icon="check" data-size="15"></span>Job summary on every pull request</li></ul>
+          <a class="btn" href="docs.html#install">Install the CLI</a>
+        </div>
+        <div class="plan featured">
+          <span class="flag">Early access</span>
+          <h3>Team</h3>
+          <div class="price"><b>$49</b><span>per repository / month</span></div>
+          <p>Hosted Driftfix watches your vendors and opens the pull request the day a breaking change ships.</p>
+          <ul class="ticks"><li><span data-icon="check" data-size="15"></span>Private repositories through a GitHub App</li><li><span data-icon="check" data-size="15"></span>Change feed for every API you use</li><li><span data-icon="check" data-size="15"></span>Slack alerts and a migrations dashboard</li></ul>
+          <a class="btn primary" href="#contact">Get your first migration free</a>
+        </div>
+        <div class="plan">
+          <h3>API providers</h3>
+          <div class="price"><b>Custom</b><span>per retired version</span></div>
+          <p>Ship your breaking change as tested pull requests to the integrators who depend on it.</p>
+          <ul class="ticks"><li><span data-icon="check" data-size="15"></span>Rules written with your team</li><li><span data-icon="check" data-size="15"></span>Adoption by integrator and version</li><li><span data-icon="check" data-size="15"></span>Sunset dates you can keep</li></ul>
+          <a class="btn" href="#contact">Talk to us</a>
+        </div>
       </div>
     </div>
   </section>
@@ -245,7 +297,7 @@ for row in r["data"]:
         <label for="f-email">Work email<input id="f-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required></label>
         <label for="f-repo">Repository<input id="f-repo" name="repo" type="text" placeholder="github.com/your-org/your-repo" required></label>
         <label for="f-api">Which API changed on you?
-          <select id="f-api" name="api"><option>OpenAI Python SDK</option><option>Stripe</option><option>Google Ads</option><option>Shopify</option><option>Something else</option></select>
+          <select id="f-api" name="api"><option>OpenAI Python SDK</option><option>OpenAI Node.js SDK</option><option>Stripe</option><option>Google Ads</option><option>Shopify</option><option>Something else</option></select>
         </label>
         <button class="btn lg primary" type="submit">Request my migration</button>
         <p class="note">We only read the repository to run the migration. For private repositories we send a GitHub App link scoped to that one repository.</p>
@@ -260,7 +312,8 @@ for row in r["data"]:
     <div class="foot">
       <div><a class="brand" href="#hero"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="var(--fg)"/><path d="M7 16.5c0-4.5 2.6-7 7-7h2.5" stroke="var(--bg)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="m14.5 6.5 3 3-3 3" stroke="var(--bg)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Driftfix</a><p>Turns API changelogs into verified pull requests.</p></div>
       <div><h4>Product</h4><ul><li><a href="#product">Live demo</a></li><li><a href="#try">Playground</a></li><li><a href="#how">How it works</a></li><li><a href="#coverage">Coverage</a></li></ul></div>
-      <div><h4>Company</h4><ul><li><a href="#security">Security</a></li><li><a href="#contact">Request access</a></li><li><a href="#why">Why now</a></li></ul></div>
+      <div><h4>Developers</h4><ul><li><a href="docs.html">Docs</a></li><li><a href="docs.html#action">GitHub Action</a></li><li><a href="https://github.com/Shashank4868/driftfix" target="_blank" rel="noopener">Source on GitHub</a></li><li><a href="https://github.com/Shashank4868/driftfix/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#pricing">Pricing</a></li><li><a href="#security">Security</a></li><li><a href="#contact">Request access</a></li><li><a href="#why">Why now</a></li></ul></div>
     </div>
     <div class="legal"><span>© 2026 Driftfix</span><span>Built by Ishaan Yadav</span></div>
   </div>
@@ -343,8 +396,55 @@ async def summarize_all(documents):
     return await asyncio.gather(*(summarize(d) for d in documents))
 </script>
 
+<script type="text/plain" id="sample-node">
+// Discord bot that answers questions from the docs. Written against openai 3.3.
+import { Configuration, OpenAIApi } from 'openai'
+import { Client, GatewayIntentBits } from 'discord.js'
+
+import { searchDocs } from './search'
+
+const openai: OpenAIApi | null = process.env.OPENAI_KEY
+    ? new OpenAIApi(
+          new Configuration({
+              apiKey: process.env.OPENAI_KEY,
+              basePath: process.env.OPENAI_PROXY,
+          })
+      )
+    : null
+
+export async function answer(question: string): Promise<string> {
+    if (!openai) return 'OpenAI is not configured.'
+
+    const embedding = await openai.createEmbedding({
+        model: 'text-embedding-3-small',
+        input: question,
+    })
+    const context = await searchDocs(embedding.data.data[0].embedding)
+
+    try {
+        const completion = await openai.createChatCompletion({
+            model: 'gpt-4o-mini',
+            messages: [
+                { role: 'system', content: `Answer using these docs:\n${context}` },
+                { role: 'user', content: question },
+            ],
+        })
+        return completion.data.choices[0].message?.content ?? ''
+    } catch (error: any) {
+        // the bot used to log "createChatCompletion failed" here
+        console.error(error.response?.status, error.response?.data)
+        return 'Something went wrong.'
+    }
+}
+
+export const client = new Client({ intents: [GatewayIntentBits.Guilds] })
+</script>
+
 <script src="engine.js" charset="utf-8"></script>
+<script src="engine-node.js" charset="utf-8"></script>
 <script src="workspace-data.js" charset="utf-8"></script>
 <script src="ui.js" charset="utf-8"></script>
 <script src="workspace.js" charset="utf-8"></script>
 <script src="site.js" charset="utf-8"></script>
+</body>
+</html>

@@ -42,7 +42,9 @@
     plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
     lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
     command: '<path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/>',
-    filter: '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>'
+    filter: '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>',
+    github: '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>',
+    book: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>'
   };
 
   function icon(name, size, cls) {
@@ -56,30 +58,36 @@
   var TOKEN = /(#[^\n]*)|([rRbBuUfF]{0,2}(?:"""[\s\S]*?(?:"""|$)|'''[\s\S]*?(?:'''|$)|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?))|\b(def|class|return|import|from|as|for|in|if|else|elif|try|except|finally|async|await|with|while|not|and|or|is|None|True|False|yield|lambda|pass|continue|break|raise|global|nonlocal)\b|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)(?=\s*\()/g;
   var V0 = /\b\w+\.(?:ChatCompletion|Completion|Embedding|Moderation|Image|Audio)\.(?:create|acreate|transcribe|translate)\b|\b\w+\.error\.\w+|\b(?:openai|oa)\.(?:api_key|api_base|organization)\b/g;
 
-  function plainMark(text, markV0) {
+  var TOKEN_JS = /(\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$))|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|`(?:\\.|[^`\\])*`?)|\b(import|from|export|default|const|let|var|function|return|async|await|new|class|extends|if|else|for|of|in|try|catch|finally|throw|typeof|instanceof|interface|type|null|undefined|true|false|this|require)\b|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_$][\w$]*)(?=\s*\()/g;
+  var V0_JS = /\b(?:createChatCompletion|createCompletion|createEmbedding|createImage|createImageEdit|createImageVariation|createModeration|createTranscription|createTranslation|listModels|retrieveModel)\b|\b(?:OpenAIApi|Configuration)\b|\bbasePath\b/g;
+
+  function plainMark(text, markV0, js) {
     if (!markV0) return esc(text);
-    var out = "", last = 0, m;
-    V0.lastIndex = 0;
-    while ((m = V0.exec(text))) {
-      out += esc(text.slice(last, m.index)) + '<mark class="v0" title="Removed in openai 1.0">' + esc(m[0]) + "</mark>";
+    var out = "", last = 0, m, rx = js ? V0_JS : V0;
+    rx.lastIndex = 0;
+    while ((m = rx.exec(text))) {
+      out += esc(text.slice(last, m.index)) + '<mark class="v0" title="' + (js ? "Removed in openai 4.0 (Node)" : "Removed in openai 1.0") + '">' + esc(m[0]) + "</mark>";
       last = m.index + m[0].length;
     }
     return out + esc(text.slice(last));
   }
 
-  function highlight(code, markV0) {
-    var out = "", last = 0, m;
-    TOKEN.lastIndex = 0;
-    while ((m = TOKEN.exec(code))) {
-      if (m[0] === "") { TOKEN.lastIndex++; continue; }
-      out += plainMark(code.slice(last, m.index), markV0);
+  /** lang: "py" (default) or "js" for JavaScript/TypeScript. */
+  function highlight(code, markV0, lang) {
+    var js = lang === "js", rx = js ? TOKEN_JS : TOKEN, out = "", last = 0, m;
+    rx.lastIndex = 0;
+    while ((m = rx.exec(code))) {
+      if (m[0] === "") { rx.lastIndex++; continue; }
+      out += plainMark(code.slice(last, m.index), markV0, js);
       var cls = m[1] ? "t-com" : m[2] ? "t-str" : m[3] ? "t-kw" : m[4] ? "t-num" : "t-fn";
-      if (cls === "t-fn" && markV0) out += plainMark(m[0], true);
+      if (cls === "t-fn" && markV0) out += plainMark(m[0], true, js);
       else out += '<span class="' + cls + '">' + esc(m[0]) + "</span>";
       last = m.index + m[0].length;
     }
-    return out + plainMark(code.slice(last), markV0);
+    return out + plainMark(code.slice(last), markV0, js);
   }
+
+  function langOf(path) { return /\.(?:[cm]?[jt]sx?)$/i.test(path || "") ? "js" : "py"; }
 
   /** Unified diff from Driftfix.diff() output. */
   function diffHTML(d, opts) {
@@ -94,7 +102,7 @@
       html += '<div class="dh"><span>@@ -' + (a0 || 0) + "," + ac + " +" + (b0 || 0) + "," + bc + " @@</span>" + (opts.label ? "<em>" + esc(opts.label) + "</em>" : "") + "</div>";
       h.lines.forEach(function (op) {
         var cls = op.t === "+" ? " add" : op.t === "-" ? " del" : "";
-        html += '<div class="dl' + cls + '"><span class="dn">' + (op.a || "") + '</span><span class="dn">' + (op.b || "") + '</span><span class="ds">' + (op.t === " " ? "" : op.t === "-" ? "-" : "+") + '</span><span class="dc">' + (highlight(op.s, false) || " ") + "</span></div>";
+        html += '<div class="dl' + cls + '"><span class="dn">' + (op.a || "") + '</span><span class="dn">' + (op.b || "") + '</span><span class="ds">' + (op.t === " " ? "" : op.t === "-" ? "-" : "+") + '</span><span class="dc">' + (highlight(op.s, false, opts.lang) || " ") + "</span></div>";
       });
     });
     return html + "</div>";
@@ -122,5 +130,5 @@
 
   var reduce = !!(root.matchMedia && root.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-  root.DriftfixUI = { icon: icon, esc: esc, ticks: ticks, plural: plural, highlight: highlight, diffHTML: diffHTML, copy: copy, reduce: reduce };
+  root.DriftfixUI = { icon: icon, esc: esc, ticks: ticks, plural: plural, highlight: highlight, langOf: langOf, diffHTML: diffHTML, copy: copy, reduce: reduce };
 })(window);
