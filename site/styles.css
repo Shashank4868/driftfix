@@ -647,7 +647,21 @@ form.lead .note { font-size: 12.5px; color: var(--muted); }
 form.lead .notice { margin: 0; }
 
 footer { border-top: 1px solid var(--line); padding-block: 48px 40px; font-size: 13.5px; color: var(--muted); }
-.foot { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)); gap: 32px; }
+.plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .plans { grid-template-columns: minmax(0, 1fr); } }
+.plan { position: relative; display: grid; gap: 14px; align-content: start; padding: 26px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.plan.featured { border-color: var(--fg); box-shadow: 0 1px 0 var(--line), 0 12px 32px -18px rgba(0, 0, 0, .35); }
+.plan h3 { font-size: 16px; }
+.plan .price { display: flex; align-items: baseline; gap: 8px; }
+.plan .price b { font-size: 34px; font-weight: 600; letter-spacing: -.03em; }
+.plan .price span { color: var(--muted); font-size: 13px; }
+.plan p { color: var(--muted); font-size: 14px; }
+.plan .ticks { margin: 0; }
+.plan .btn { justify-self: start; margin-top: 4px; }
+.plan .flag { position: absolute; top: 18px; right: 18px; font: 500 11.5px var(--mono); padding: 3px 8px; border-radius: 999px; background: var(--fg); color: var(--bg); }
+.top .icon-btn.gh { color: var(--fg-2); }
+@media (max-width: 560px) { .top .icon-btn.gh { display: none; } }
+.foot { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 32px; }
 @media (max-width: 720px) { .foot { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .foot > div:first-child { grid-column: 1 / -1; } }
 .foot h4 { font-size: 13px; color: var(--fg); margin-bottom: 12px; font-weight: 500; }
 .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }

@@ -8,9 +8,10 @@
 - Imports keep the file's own quote and semicolon style; unwrapped constructors are re-indented.
 - Files that import `openai` inside a function are now left for a human instead of having a client hoisted to module level.
 - `driftfix run` lists flagged items even when there is nothing safe to change; `--json` reports `needs_human`.
-- `scan --json`, `changes --json` and a reusable GitHub Action (`action.yml`).
+- `scan --json`, `scan --markdown`, `changes --json` and a reusable GitHub Action (`action.yml`).
+- Website: the playground migrates JavaScript and TypeScript too (browser port in `site/engine-node.js`, kept identical by `tests/parity.py`), plus docs, pricing, favicon and share image.
 
-## 0.1.0 (2026-10-21)
+## 0.1.0
 
 - First release: OpenAI Python SDK 0.x -> 1.x (`openai-python-v1`) with libcst rules, before/after test runs, rollback on regression, branch + commit, and a pull request description.
 - Browser port of the Python rules for the website playground, kept identical by `tests/parity.py`.

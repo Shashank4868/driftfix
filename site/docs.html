@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Driftfix Docs</title>
+<meta name="description" content="Install Driftfix, run it on a repository, use the GitHub Action, and see exactly what each migration rewrites.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .docs { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 56px; padding-block: 48px 96px; }
+  @media (max-width: 860px) { .docs { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 28px 64px; } }
+  .toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); align-self: start; display: grid; gap: 2px; font-size: 13.5px; }
+  @media (max-width: 860px) { .toc { position: static; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); } }
+  .toc b { font: 500 12px var(--mono); color: var(--faint); margin: 14px 0 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .toc b:first-child { margin-top: 0; }
+  .toc a { color: var(--muted); padding: 4px 0; }
+  .toc a:hover { color: var(--fg); }
+  .doc { min-width: 0; max-width: 760px; }
+  .doc h1 { font-size: clamp(30px, 4vw, 40px); letter-spacing: -.035em; text-wrap: balance; }
+  .doc .lede { color: var(--muted); font-size: 17px; margin-top: 12px; max-width: 60ch; }
+  .doc h2 { font-size: 22px; letter-spacing: -.02em; margin-top: 56px; padding-top: 8px; scroll-margin-top: 80px; }
+  .doc h3 { font-size: 16px; margin-top: 28px; scroll-margin-top: 80px; }
+  .doc p, .doc li { color: var(--fg-2); font-size: 15px; line-height: 1.65; }
+  .doc p { margin-top: 12px; max-width: 68ch; }
+  .doc ul, .doc ol { margin: 12px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+  .doc pre.code { margin-top: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-2); overflow-x: auto; font: 13px/1.65 var(--mono); color: var(--fg-2); }
+  .doc :not(pre) > code { font: 12.5px var(--mono); padding: 1px 5px; border-radius: 5px; background: var(--bg-3); border: 1px solid var(--line); }
+  .doc .t { margin-top: 14px; overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+  .doc table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .doc th, .doc td { text-align: left; padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+  .doc thead th { border-top: 0; font-weight: 500; color: var(--muted); background: var(--bg-2); }
+  .doc td code { white-space: nowrap; }
+  .doc .callout { margin-top: 16px; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg-2); font-size: 14px; color: var(--fg-2); }
+  .doc .callout b { color: var(--fg); }
+  .doc .rel { display: grid; gap: 14px; margin-top: 14px; }
+  .doc .rel > div { border-left: 2px solid var(--line-2); padding-left: 16px; }
+  .doc .rel h3 { margin-top: 0; display: flex; gap: 10px; align-items: baseline; }
+  .doc .rel h3 span { font: 400 12.5px var(--mono); color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Driftfix home">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="var(--fg)"/><path d="M7 16.5c0-4.5 2.6-7 7-7h2.5" stroke="var(--bg)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="m14.5 6.5 3 3-3 3" stroke="var(--bg)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Driftfix <span class="dim" style="font-weight:400">Docs</span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="index.html#product">Product</a>
+      <a href="index.html#try">Playground</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+    </nav>
+    <div class="right">
+      <a class="icon-btn gh" href="https://github.com/Shashank4868/driftfix" target="_blank" rel="noopener" aria-label="Driftfix on GitHub" data-icon="github" data-size="17"></a>
+      <a class="btn sm primary" href="index.html#contact">Request access</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap docs">
+  <nav class="toc" aria-label="On this page">
+    <b>Start</b>
+    <a href="#install">Install</a>
+    <a href="#quickstart">Quick start</a>
+    <b>Reference</b>
+    <a href="#commands">Commands</a>
+    <a href="#action">GitHub Action</a>
+    <a href="#verification">Verification</a>
+    <a href="#pr">The pull request</a>
+    <b>Migrations</b>
+    <a href="#openai-python-v1">OpenAI Python v1</a>
+    <a href="#openai-node-v4">OpenAI Node v4</a>
+    <b>Project</b>
+    <a href="#faq">FAQ</a>
+    <a href="#changelog">Changelog</a>
+  </nav>
+
+  <article class="doc">
+    <h1>Driftfix documentation</h1>
+    <p class="lede">Driftfix rewrites code that an API provider's breaking change has broken, checks the result with your own tests, and writes a pull request a reviewer can approve in a minute. Everything on this page runs locally; nothing is uploaded.</p>
+
+    <h2 id="install">Install</h2>
+    <p>Driftfix needs Python 3.10 or newer. Node.js is only needed to syntax-check JavaScript.</p>
+    <pre class="code">pip install git+https://github.com/Shashank4868/driftfix
+driftfix --version</pre>
+    <p>For development, clone the repository and install it in editable mode with the test extras:</p>
+    <pre class="code">git clone https://github.com/Shashank4868/driftfix
+cd driftfix
+python -m venv .venv &amp;&amp; . .venv/bin/activate
+pip install -e ".[dev]"
+pytest -q</pre>
+
+    <h2 id="quickstart">Quick start</h2>
+    <ol>
+      <li><b>See what's affected.</b> <code>driftfix scan path/to/repo</code> lists every line a known breaking change touches. It edits nothing and exits with 1 when it finds something, so it works as a CI check.</li>
+      <li><b>Fix and verify.</b> <code>driftfix run path/to/repo</code> runs your tests, applies the edits and raises dependency pins, then runs the tests again. If anything gets worse, every file is restored.</li>
+      <li><b>Open the pull request.</b> Add <code>--open-pr</code> to push the branch and open the PR with the GitHub CLI, or read the description Driftfix wrote to <code>DRIFTFIX_PR.md</code>.</li>
+    </ol>
+    <pre class="code">$ driftfix run .
+
+  ▸ Change           OpenAI Python SDK 0.x -&gt; &gt;=1.0
+  ▸ Scan             3 Python files, 1 affected, 8 edits
+  ▸ Tests before     3 failed  APIRemovedInV1: v0 call removed in openai&gt;=1.0
+  ▸ Patch            app.py  +8 -7
+  ▸ Verify           checked 1 file(s), tests 3 passed
+  ▸ Commit           d0d3c0f on driftfix/openai-python-v1
+  ▸ Pull request     ready  DRIFTFIX_PR.md</pre>
+
+    <h2 id="commands">Commands</h2>
+    <h3><code>driftfix changes</code></h3>
+    <p>Lists the breaking changes Driftfix can migrate, with versions, release dates and changelog links. Add <code>--json</code> for machine-readable output.</p>
+    <h3><code>driftfix scan [PATH]</code></h3>
+    <div class="t"><table>
+      <thead><tr><th>Option</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>--change ID</code></td><td>Pick a migration. Default <code>auto</code> detects it from the code.</td></tr>
+        <tr><td><code>--json</code></td><td>Every edit and review note as JSON, for scripts.</td></tr>
+        <tr><td><code>--markdown</code></td><td>A Markdown report, for example for a CI job summary.</td></tr>
+      </tbody>
+    </table></div>
+    <h3><code>driftfix run [PATH]</code></h3>
+    <div class="t"><table>
+      <thead><tr><th>Option</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>--change ID</code></td><td>Pick a migration instead of detecting it.</td></tr>
+        <tr><td><code>--skip-tests</code></td><td>Verify with syntax checks only.</td></tr>
+        <tr><td><code>--no-deps</code></td><td>Leave dependency pins and lockfiles alone.</td></tr>
+        <tr><td><code>--no-branch</code></td><td>Edit files in place without creating a branch or commit.</td></tr>
+        <tr><td><code>--branch NAME</code></td><td>Branch name. Default <code>driftfix/&lt;change-id&gt;</code>.</td></tr>
+        <tr><td><code>--open-pr</code></td><td>Push the branch and open the pull request with <code>gh</code>.</td></tr>
+        <tr><td><code>--pr-out FILE</code></td><td>Where to write the pull request description.</td></tr>
+        <tr><td><code>--python EXE</code></td><td>Interpreter for the repository's tests. Default: its <code>.venv</code>, else Driftfix's own.</td></tr>
+        <tr><td><code>--json</code></td><td>A JSON report: status, edits, test results before and after, branch, commit, PR URL.</td></tr>
+      </tbody>
+    </table></div>
+    <p>Exit codes: <code>0</code> verified or nothing to do, <code>1</code> rolled back because verification failed.</p>
+
+    <h2 id="action">GitHub Action</h2>
+    <p>Report affected code on every pull request, with a table in the job summary:</p>
+    <pre class="code">name: Driftfix
+on: [pull_request]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Shashank4868/driftfix@main
+        with:
+          fail-on-findings: true</pre>
+    <p>Or let it open the fix on a schedule:</p>
+    <pre class="code">on:
+  schedule: [{ cron: "0 6 * * 1" }]
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions: { contents: write, pull-requests: write }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Shashank4868/driftfix@main
+        with:
+          mode: fix</pre>
+    <div class="t"><table>
+      <thead><tr><th>Input</th><th>Default</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>path</code></td><td><code>.</code></td><td>Directory to scan.</td></tr>
+        <tr><td><code>change</code></td><td><code>auto</code></td><td>Migration id, or detect it.</td></tr>
+        <tr><td><code>mode</code></td><td><code>scan</code></td><td><code>scan</code> reports; <code>fix</code> patches, verifies and opens a PR.</td></tr>
+        <tr><td><code>fail-on-findings</code></td><td><code>false</code></td><td>Fail the job when affected code is found.</td></tr>
+        <tr><td><code>github-token</code></td><td><code>github.token</code></td><td>Token for pushing the branch and opening the PR.</td></tr>
+      </tbody>
+    </table></div>
+    <p>Outputs: <code>edits</code> (number of edits found) and <code>pr-url</code> (in fix mode).</p>
+
+    <h2 id="verification">Verification and rollback</h2>
+    <ul>
+      <li><b>Syntax:</b> every changed Python file is compiled, JavaScript passes <code>node --check</code>, and TypeScript is checked for balanced brackets with strings and comments masked.</li>
+      <li><b>Tests:</b> <code>pytest</code> for Python, <code>npm test</code> for Node when dependencies are installed. They run before and after the patch.</li>
+      <li><b>Rollback:</b> if the suite passed before and fails after, or gets more failures than it had, every edited file, dependency file and lockfile is restored and no pull request is written.</li>
+      <li><b>Already broken code:</b> a suite that was failing because of the removed API (for example <code>APIRemovedInV1</code>) is expected to go green after the patch, and the PR says so.</li>
+    </ul>
+
+    <h2 id="pr">The pull request</h2>
+    <p>Each pull request has the same sections, so reviewers know where to look:</p>
+    <ul>
+      <li>What changed: one row per edit with file, line, rule, before and after.</li>
+      <li>Dependencies: pins raised and how the lockfile was refreshed.</li>
+      <li>Verification: syntax checks and test results before and after.</li>
+      <li>Needs a human look: everything Driftfix found but would not guess at, with file and line.</li>
+    </ul>
+
+    <h2 id="openai-python-v1">OpenAI Python SDK 0.x → 1.x</h2>
+    <p>Change id <code>openai-python-v1</code>. In openai 1.0.0 (November 2023) module-level calls were removed and raise <code>APIRemovedInV1</code>. <a href="https://github.com/openai/openai-python/discussions/742" target="_blank" rel="noopener">Official migration guide</a>.</p>
+    <div class="t"><table>
+      <thead><tr><th>Before</th><th>After</th></tr></thead>
+      <tbody>
+        <tr><td><code>openai.ChatCompletion.create(...)</code></td><td><code>client.chat.completions.create(...)</code></td></tr>
+        <tr><td><code>openai.ChatCompletion.acreate(...)</code></td><td><code>async_client.chat.completions.create(...)</code></td></tr>
+        <tr><td><code>openai.Completion / Embedding / Moderation</code></td><td><code>client.completions / embeddings / moderations</code></td></tr>
+        <tr><td><code>openai.Image.create</code></td><td><code>client.images.generate</code></td></tr>
+        <tr><td><code>openai.Audio.transcribe / translate</code></td><td><code>client.audio.transcriptions / translations.create</code></td></tr>
+        <tr><td><code>openai.api_key = ...</code>, <code>api_base</code>, <code>organization</code></td><td><code>client = OpenAI(api_key=..., base_url=..., organization=...)</code></td></tr>
+        <tr><td><code>r["choices"][0]["message"]["content"]</code></td><td><code>r.choices[0].message.content</code></td></tr>
+        <tr><td><code>openai.error.InvalidRequestError</code></td><td><code>openai.BadRequestError</code></td></tr>
+        <tr><td><code>request_timeout=</code></td><td><code>timeout=</code></td></tr>
+        <tr><td><code>openai==0.28.1</code> in requirements, pyproject, setup, Pipfile</td><td><code>openai&gt;=1.0</code></td></tr>
+      </tbody>
+    </table></div>
+    <p>Left for a human, with a note in the PR: <code>.get()</code> on a response, Azure's <code>engine=</code>, settings assigned inside a function, and files that import <code>openai</code> inside a function.</p>
+
+    <h2 id="openai-node-v4">OpenAI Node.js SDK 3.x → 4.x</h2>
+    <p>Change id <code>openai-node-v4</code>, for <code>.js .mjs .cjs .jsx .ts .mts .cts .tsx</code>. v4 replaced the axios-based <code>OpenAIApi</code> and <code>Configuration</code> classes with a single client and returns payloads directly. <a href="https://github.com/openai/openai-node/discussions/217" target="_blank" rel="noopener">Official migration guide</a>.</p>
+    <div class="t"><table>
+      <thead><tr><th>Before</th><th>After</th></tr></thead>
+      <tbody>
+        <tr><td><code>import { Configuration, OpenAIApi } from 'openai'</code></td><td><code>import OpenAI from 'openai'</code> (quotes and semicolons kept)</td></tr>
+        <tr><td><code>new OpenAIApi(new Configuration({ apiKey }))</code></td><td><code>new OpenAI({ apiKey })</code></td></tr>
+        <tr><td><code>basePath:</code></td><td><code>baseURL:</code></td></tr>
+        <tr><td><code>openai.createChatCompletion(...)</code></td><td><code>openai.chat.completions.create(...)</code></td></tr>
+        <tr><td><code>createCompletion / createEmbedding / createModeration</code></td><td><code>completions / embeddings / moderations.create</code></td></tr>
+        <tr><td><code>createImage / listModels / retrieveModel</code></td><td><code>images.generate / models.list / models.retrieve</code></td></tr>
+        <tr><td><code>res.data.choices</code>, <code>const { data } = await ...</code></td><td><code>res.choices</code>, <code>const data = await ...</code></td></tr>
+        <tr><td><code>let client: OpenAIApi</code></td><td><code>let client: OpenAI</code></td></tr>
+        <tr><td><code>"openai": "^3.3.0"</code></td><td><code>"openai": "^4.104.0"</code>, lockfile refreshed with npm, pnpm or yarn</td></tr>
+      </tbody>
+    </table></div>
+    <p>Left for a human: streaming with <code>responseType: "stream"</code>, a second axios options argument, <code>error.response.status</code> error handling, <code>createTranscription</code>, <code>createFile</code> and <code>createFineTune</code>, and v3 type imports such as <code>ChatCompletionRequestMessage</code>.</p>
+
+    <h2 id="faq">FAQ</h2>
+    <h3>Does my code leave my machine?</h3>
+    <p>No. The CLI and the Action run where you run them. The website playground runs the same rules in your browser.</p>
+    <h3>Why not just ask an LLM to migrate it?</h3>
+    <p>Rules are deterministic, so the same input gives the same diff, every edit can be listed and reviewed, and anything uncertain is flagged instead of guessed. A model is a good fallback for the flagged cases, not for the bulk of the rewrite.</p>
+    <h3>What if my repository has no tests?</h3>
+    <p>Driftfix still syntax-checks every changed file and re-scans for leftover calls, and the PR says plainly that no test suite ran.</p>
+    <h3>Which migration comes next?</h3>
+    <p>Stripe API version upgrades and Google Ads API sunsets. <a href="https://github.com/Shashank4868/driftfix/issues/new" target="_blank" rel="noopener">Open an issue</a> to ask for one.</p>
+
+    <h2 id="changelog">Changelog</h2>
+    <div class="rel">
+      <div><h3>0.2.0 <span>2026-11-03</span></h3><ul>
+        <li>New migration: OpenAI Node.js SDK 3.x → 4.x for JavaScript and TypeScript.</li>
+        <li>Dependency pins raised with the code; npm, pnpm and yarn lockfiles refreshed and restored on rollback.</li>
+        <li>Import style kept, unwrapped constructors re-indented, <code>OpenAIApi</code> types renamed.</li>
+        <li>Function-local <code>import openai</code> is left for a human instead of hoisting a client.</li>
+        <li><code>scan --markdown</code> and the GitHub Action.</li>
+      </ul></div>
+      <div><h3>0.1.0</h3><ul>
+        <li>OpenAI Python SDK 0.x → 1.x with libcst rules, tests before and after, rollback, branch, commit and PR description.</li>
+        <li>Browser engine for the website, kept identical to the Python rules by a parity test.</li>
+      </ul></div>
+    </div>
+  </article>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="legal"><span>© 2026 Driftfix · MIT licensed</span><span><a href="https://github.com/Shashank4868/driftfix" target="_blank" rel="noopener">Source on GitHub</a></span></div>
+  </div>
+</footer>
+
+<script src="ui.js" charset="utf-8"></script>
+<script>
+  document.querySelectorAll("[data-icon]").forEach(function (n) {
+    n.insertAdjacentHTML("afterbegin", window.DriftfixUI.icon(n.getAttribute("data-icon"), +(n.getAttribute("data-size") || 16)));
+  });
+</script>
+</body>
+</html>

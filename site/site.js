@@ -17,15 +17,18 @@
 
   // ---------- playground ----------
   var S = { mode: "support", files: [], current: 0, tab: "diff", merged: false, last: null, repo: null,
-    source: { support: $("sample-support").textContent, worker: $("sample-worker").textContent,
+    source: { support: $("sample-support").textContent, worker: $("sample-worker").textContent, node: $("sample-node").textContent.replace(/^\n/, ""),
       paste: "# Paste a Python file written for the old OpenAI SDK (openai < 1.0).\n# Driftfix rewrites it as you type.\n\nimport openai\n\nopenai.api_key = \"sk-...\"\n\nreply = openai.ChatCompletion.create(\n    model=\"gpt-4o-mini\",\n    messages=[{\"role\": \"user\", \"content\": \"Hello\"}],\n)\nprint(reply[\"choices\"][0][\"message\"][\"content\"])\n" } };
-  var NAMES = { support: "app.py", worker: "worker.py", paste: "your_code.py" };
+  var NAMES = { support: "app.py", worker: "worker.py", node: "src/bot.ts", paste: "your_code.py" };
   var SUPPORT = S.source.support.replace(/\r\n/g, "\n");
   var src = $("pg-src"), hl = $("pg-hl"), gut = $("pg-gut"), timers = [];
+  var NODE_HINT = /\bfrom\s*['"]openai['"]|require\(\s*['"]openai['"]\s*\)|\bOpenAIApi\b/;
+  var LANG = { py: { name: "Python", change: "openai 0.x → 1.x", engine: E }, js: { name: "TypeScript", change: "openai-node 3.x → 4.x", engine: E.node } };
 
+  function langNow() { return U.langOf($("pg-name").textContent); }
   function paintEditor() {
     var code = src.value;
-    hl.innerHTML = U.highlight(code, true) + "\n\n";
+    hl.innerHTML = U.highlight(code, true, langNow()) + "\n\n";
     var n = code.split("\n").length, g = [];
     for (var i = 1; i <= n; i++) g.push(i);
     gut.textContent = g.join("\n") + "\n\n";
@@ -38,6 +41,10 @@
     paintEditor();
     if (S.mode === "repo") return;
     S.source[S.mode] = src.value;
+    if (S.mode === "paste") {
+      var name = NODE_HINT.test(src.value) ? "your_code.ts" : "your_code.py";
+      if (name !== NAMES.paste) { NAMES.paste = name; $("pg-name").textContent = name; paintEditor(); }
+    }
     clearTimeout(deb); deb = setTimeout(function () { run(false); }, 200);
   });
   src.addEventListener("keydown", function (e) {
@@ -52,8 +59,14 @@
   });
 
   function migrate(path, code) {
-    var t0 = performance.now(), before = code.replace(/\r\n/g, "\n"), r = E.migrate(before);
-    return { path: path, before: before, after: r.code, result: r, diff: E.diff(before, r.code), remaining: E.remaining(r.code), balanced: E.balanced(r.code), ms: performance.now() - t0 };
+    var lang = U.langOf(path), eng = LANG[lang].engine;
+    var t0 = performance.now(), before = code.replace(/\r\n/g, "\n"), r = eng.migrate(before);
+    return { path: path, lang: lang, before: before, after: r.code, result: r, diff: E.diff(before, r.code), remaining: eng.remaining(r.code), balanced: eng.balanced(r.code), ms: performance.now() - t0 };
+  }
+  // the language the current set of files is mostly written in
+  function langOfFiles() {
+    var js = S.files.filter(function (f) { return f.lang === "js"; }).length;
+    return S.files.length ? (js * 2 >= S.files.length ? "js" : "py") : langNow();
   }
   function summary(files, note) {
     var s = { edits: 0, notes: 0, added: 0, removed: 0, changed: 0, left: 0, ok: true, ms: 0, calls: 0, note: note };
@@ -67,7 +80,7 @@
   function pipeline(stage, s, failAt) {
     s = s || {};
     var steps = [
-      ["Change", "openai 0.x → 1.x"],
+      ["Change", LANG[langOfFiles()].change],
       ["Scan", s.calls != null ? plural(s.calls, "removed call") + (s.edits > s.calls ? ", " + (s.edits - s.calls) + " related" : "") : "…"],
       ["Patch", s.edits != null ? (s.edits ? plural(s.edits, "edit") + " · +" + s.added + " −" + s.removed : "nothing to change") : "…"],
       ["Verify", s.left != null ? (s.left === 0 && s.ok ? "0 removed calls left" : plural(s.left, "call") + " left") : "…"],
@@ -98,7 +111,7 @@
   }
 
   function status(s) {
-    $("pg-status").innerHTML = '<span>' + icon("terminal", 12) + "Python</span><span>UTF-8</span><span>" + (s.note ? esc(s.note) : plural(S.files[0] ? S.files[0].before.split("\n").length : 0, "line")) + '</span><span class="sp"></span><span>engine ' + Math.max(1, Math.round(s.ms)) + " ms · in your browser</span><span class=\"" + (s.left ? "bad" : "good") + '">' + icon(s.left ? "x" : "check", 12) + s.left + " removed calls left</span>";
+    $("pg-status").innerHTML = '<span>' + icon("terminal", 12) + LANG[langOfFiles()].name + "</span><span>UTF-8</span><span>" + (s.note ? esc(s.note) : plural(S.files[0] ? S.files[0].before.split("\n").length : 0, "line")) + '</span><span class="sp"></span><span>engine ' + Math.max(1, Math.round(s.ms)) + " ms · in your browser</span><span class=\"" + (s.left ? "bad" : "good") + '">' + icon(s.left ? "x" : "check", 12) + s.left + " removed calls left</span>";
   }
 
   function out(pending) {
@@ -117,9 +130,11 @@
   }
   function where(f, line) { return (S.files.length > 1 ? f.path + ":" : "L") + line; }
   function viewDiff(f) {
-    if (!f.result.aliases.length) return '<div class="empty">' + icon("file", 20) + "<b>No <code>import openai</code> here</b><span>Driftfix looks for code written against the openai 0.x Python SDK.</span></div>";
+    if (!f.result.aliases.length) return '<div class="empty">' + icon("file", 20) + (f.lang === "js"
+      ? "<b>No v3 <code>OpenAIApi</code> import here</b><span>Driftfix looks for code written against the openai 3.x Node SDK.</span></div>"
+      : "<b>No <code>import openai</code> here</b><span>Driftfix looks for code written against the openai 0.x Python SDK.</span></div>");
     if (f.after === f.before) return '<div class="empty">' + icon("check", 20) + "<b>Nothing to migrate</b><span>No calls to the removed API in this file." + (f.result.notes.length ? " Check the Review tab." : "") + "</span></div>";
-    return U.diffHTML(f.diff, { label: f.path });
+    return U.diffHTML(f.diff, { label: f.path, lang: f.lang });
   }
   function viewEdits() {
     var rows = [];
@@ -134,7 +149,7 @@
     return '<ul class="review">' + items.join("") + "</ul>";
   }
   function viewPR() {
-    var C = E.CHANGE, edits = 0, rows = [], notes = [], left = 0, ok = true;
+    var C = LANG[langOfFiles()].engine.CHANGE, edits = 0, rows = [], notes = [], left = 0, ok = true;
     S.files.forEach(function (f) {
       edits += f.result.edits.length; left += f.remaining.length; ok = ok && f.balanced;
       f.result.edits.forEach(function (e) { rows.push("<tr><td><code>" + esc(f.path) + ":" + e.line + "</code></td><td>" + esc(e.rule) + '</td><td><code class="b">' + esc(e.before) + '</code></td><td><code class="a">' + esc(e.after) + "</code></td></tr>"); });
@@ -147,7 +162,8 @@
     var ck = [
       [left ? "fail" : "pass", "driftfix/removed-calls", left ? plural(left, "call") + " left" : "No calls to the removed API remain"],
       [ok ? "pass" : "fail", "driftfix/structure", ok ? "Brackets, strings and comments balance" : "Structure check failed"],
-      recorded ? ["pass", "tests/pytest", "3 failed before, 3 passed after (recorded CLI run)"] : ["skip", "tests", "Your suite runs before and after with driftfix run"]
+      recorded ? ["pass", "tests/pytest", "3 failed before, 3 passed after (recorded CLI run)"]
+        : ["skip", "tests", "Your suite runs before and after with driftfix run"]
     ];
     var repoName = S.mode === "repo" && S.repo ? S.repo.label : "your-repo";
     return '<div class="prv"><h3>' + esc(C.title) + ' <span class="dim">#1</span></h3>' +
@@ -169,7 +185,7 @@
     if (mode === "repo") {
       src.readOnly = true;
       if (S.repo && S.repo.files.length) { S.files = S.repo.files; S.last = S.repo.sum; files(); show(0); pipeline(5, S.repo.sum); status(S.repo.sum); }
-      else { S.files = []; $("pg-files").hidden = true; $("pg-name").textContent = "github"; src.value = "# Scan a public GitHub repository.\n# Its Python files that import openai appear here."; paintEditor(); pipeline(-1); $("pg-status").innerHTML = "<span>Waiting for a repository</span>"; out(); }
+      else { S.files = []; $("pg-files").hidden = true; $("pg-name").textContent = "github"; src.value = "# Scan a public GitHub repository.\n# Its Python, JavaScript and TypeScript files that use openai appear here."; paintEditor(); pipeline(-1); $("pg-status").innerHTML = "<span>Waiting for a repository</span>"; out(); }
       return;
     }
     $("pg-files").hidden = true; src.readOnly = false;
@@ -208,8 +224,8 @@
     S.repo = { label: label, files: results, sum: s }; S.files = results; S.current = 0; S.last = s; S.tab = "diff"; S.merged = false;
     if (!results.length) {
       pipeline(5, { calls: 0, edits: 0, left: 0, ok: true, notes: 0, added: 0, removed: 0 });
-      msg("info", "No Python file in <code>" + esc(label) + "</code> imports <code>openai</code>. Try one of the examples.");
-      src.value = "# No Python files in " + label + " import openai."; paintEditor(); out(); status(s);
+      msg("info", "No file in <code>" + esc(label) + "</code> uses the old <code>openai</code> Python or Node SDK. Try one of the examples.");
+      src.value = "# No files in " + label + " use the old openai SDKs."; paintEditor(); out(); status(s);
       return;
     }
     files(); show(0);
@@ -229,7 +245,7 @@
       var branch = spec.branch || (await getJSON("https://api.github.com/repos/" + spec.owner + "/" + spec.repo)).default_branch;
       var tree = await getJSON("https://api.github.com/repos/" + spec.owner + "/" + spec.repo + "/git/trees/" + encodeURIComponent(branch) + "?recursive=1");
       var skip = /(^|\/)(\.venv|venv|env|node_modules|site-packages|build|dist|\.git|__pycache__|\.tox)\//;
-      var py = (tree.tree || []).filter(function (t) { return t.type === "blob" && /\.py$/.test(t.path) && !skip.test(t.path); });
+      var py = (tree.tree || []).filter(function (t) { return t.type === "blob" && /\.(py|[cm]?[jt]sx?)$/.test(t.path) && !/\.(d\.ts|min\.js)$/.test(t.path) && !skip.test(t.path); });
       var capped = py.slice(0, 150), results = [], next = 0;
       async function worker() {
         while (next < capped.length) {
@@ -243,7 +259,7 @@
         }
       }
       await Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]);
-      finishRepo(label, results, plural(py.length, "Python file") + " @ " + branch, t0);
+      finishRepo(label, results, plural(py.length, "source file") + " @ " + branch, t0);
     } catch (err) {
       msg("error", err && err.kind === "rate" ? "GitHub's limit for anonymous requests (60 an hour) was reached. Try again later, or use the bundled sample."
         : err && err.kind === "missing" ? "That repository wasn't found, or it's private. From the browser, Driftfix can only read public repositories."
@@ -257,9 +273,9 @@
     clearTimers(); $("pg-msg").hidden = true;
     var label = D.org + "/" + repo.name; $("pg-repo-in").value = label;
     var t0 = performance.now();
-    var py = repo.files.filter(function (f) { return /\.py$/.test(f.path); });
+    var py = repo.files.filter(function (f) { return /\.(py|[cm]?[jt]sx?)$/.test(f.path); });
     pipeline(1, {});
-    finishRepo(label, py.map(function (f) { return migrate(f.path, f.code); }).filter(function (f) { return f.result.aliases.length; }), plural(py.length, "Python file") + " · bundled sample", t0);
+    finishRepo(label, py.map(function (f) { return migrate(f.path, f.code); }).filter(function (f) { return f.result.aliases.length; }), plural(py.length, "source file") + " · bundled sample", t0);
   }
 
   // ---------- recorded CLI run ----------
